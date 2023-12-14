@@ -1,17 +1,17 @@
-const express = require('express');
-const app = express();
-let port = 3010 || process.env.PORT;
-const http = require('http').Server(app);
-let Sequelize = require('./sqlite');
-let Todos = require('./models/todo');
-let query = require('./querydb');
-let routerPath = require('./routes/auth');
-let dotenv = require('dotenv');
-let UserTodo = require('./sqlite_todo').UserTodo;
-let filterPath = require('./routes/filter');
+const express = require("express");
+let dotenv = require("dotenv");
+const http = require("http");
+const { AppDB } = require("./sqlite");
+let routerPath = require("./routes/auth");
+let User = require("./models/user");
+let Todo = require("./models/todo");
+// let query = require("./querydb");
+// let filterPath = require("./routes/filter");
 
 dotenv.config();
+let port = process.env.PORT || 3010;
 
+const app = express();
 //middle ware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -22,24 +22,26 @@ app.use("/api", routerPath);
 
 // app.use("/api/todos/filter", filterPath);
 
-Sequelize.sequelize.sync().then( async () => {
-    await UserTodo.sync();
-    console.log("TODO table successfully created!")
-}).catch((err) => {
-    console.log("unable to connect to db", err.message)
-});
-// connection to db
-Sequelize.sequelize.authenticate().then(() => {
-    console.log("successful connection to sqlite..")
-}).catch((err) => {
-    console.log(err.message);
-});
+async function main() {
+  try {
+    await AppDB.authenticate();
+    await AppDB.sync();
 
-// listen for port connections
-let server = http.listen(port);
-server.on("listening", () => {
-    console.log("listening on port %d", parseInt(port));
-});
-server.on("error", (err) => {
-    console.log(err.message);
-})
+    await User.sync();
+    await Todo.sync();
+
+    const server = http.createServer(app);
+    server.listen(port);
+    server.on("listening", () => {
+      console.log("listening on port %d", parseInt(port));
+    });
+
+    server.on("error", (err) => {
+      console.log(err.message);
+    });
+  } catch (error) {
+    console.error("Error starting application", error);
+  }
+}
+
+main();

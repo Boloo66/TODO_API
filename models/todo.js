@@ -1,22 +1,24 @@
-const Sequelize = require("../sqlite_todo");
+const { AppDB, DataTypes } = require("../sqlite");
 
-let DataTypes = Sequelize.DataTypes;
-let sequelize = Sequelize.UserTodo;
-
-const Todo = sequelize.define("todos_tb", {
-     userid: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
-        allowNull: false
-     },
-    todo: {
-        type: DataTypes.STRING,
-        allowNull: true
+const Todo = AppDB.define("todo", {
+  userid: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    allowNull: false,
+    references: {
+      model: "users",
+      key: "id",
     },
-    status: {
-        type: DataTypes.BOOLEAN,
-        allowNull:false       
-    }
+  },
+  todo: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  status: {
+    // "not_started", "in_progress", "completed"
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+  },
 });
 
 module.exports = Todo;
