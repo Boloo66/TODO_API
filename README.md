@@ -2,7 +2,7 @@
 
 -How to use:
 
--- run "npm install" in the package directory to install dependencies.
+-- run `npm install` in the package directory to install dependencies.
 -- use any client application to test the endpoints as specified in the documentation.
 
 - link <https://documenter.getpostman.com/view/30204327/2s9YkkeNEy>
