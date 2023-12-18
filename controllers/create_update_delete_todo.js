@@ -10,7 +10,7 @@ module.exports.CreateTodo = async function (userid, todo, status, req, res) {
   try {
     Todo.create({ userid, todo, status })
       .then((todo) => {
-       return res.send(todo);
+        return res.send(todo);
       })
       .catch((err) => {
         console.error(err)
@@ -18,7 +18,7 @@ module.exports.CreateTodo = async function (userid, todo, status, req, res) {
       });
   } catch (err) {
     console.log("CREATION FAILED");
-   return res.status(400).send(err);
+    return res.status(400).send(err);
   }
 };
 
@@ -30,22 +30,19 @@ module.exports.updateTodo = async function (
   req,
   res
 ) {
-  const updatedValue = { todo, status };
+  const payload = { todo, status };
   let data = { userid, todo, status };
-  let { error } = await validateTodo(data);
+  let { error } = validateTodo(data);
+  if (error) return res.status(400).send(error.details[0].message);
 
-  if (error) return res.status(401).send(error.details[0].message);
   try {
-    await Todo.update(updatedValue, {
-      where: {
-        id: id,
-        userid: userid,
-      },
-    })
-      .then(() => res.send(updatedValue))
-      .catch((err) => res.send("update failed"));
+    await Todo.update(payload, { where: { id, userid, } })
+
+    const updated = await Todo.findByPk(id)
+
+    return res.json(updated)
   } catch (err) {
-    res.send(`${err}: Could not update item`);
+    return res.send(`${err}: Could not update item`);
   }
 };
 

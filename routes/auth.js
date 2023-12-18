@@ -101,13 +101,13 @@ router.get("/todos", verifyToken, async (req, res, next) => {
     defaultSize = convertedSize;
   }
 
-  let currentUser = await User.findOne({ where: { userid: req.user.id } });
-  let userid = await currentUser.userid;
+  // let currentUser = await User.findOne({ where: { userid: req.user.id } });
+  // let userid = await currentUser.userid;
   // res.send(userid);
 
   try {
     let userTodos = await Todo.findAndCountAll({
-      where: { userid },
+      where: { userid: req.user.id },
       limit: defaultSize,
       offset: defaultPage * defaultSize,
     });
@@ -134,11 +134,11 @@ router.get("/todos", verifyToken, async (req, res, next) => {
 //TO EDIT A SINGLE TODO ITEM
 
 router.patch("/todos/:id", verifyToken, async (req, res) => {
-  let currentUser = await User.findOne({ where: { userid: req.user.id } });
-  let userid = currentUser.userid;
+  // let currentUser = await User.findOne({ where: { userid: req.user.id } });
+  // let userid = currentUser.userid;
   let id = req.params.id;
 
-  updateTodo(id, userid, req.body.todo, req.body.status, req, res);
+  updateTodo(id, req.user.id, req.body.todo, req.body.status, req, res);
 });
 
 router.delete("/todos/:id", verifyToken, (req, res) => {
